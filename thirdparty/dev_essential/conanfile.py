@@ -18,7 +18,8 @@ class ConanProduct(ConanFile):
     def init(self):
         if not self.conan_data:
             # copy single source of truth conan_data from repo root
-            copy(self, "conandata.yml", src=str(Path(__file__).parents[2]), dst=".")
+            copy(self, "conandata.yml", src=str(Path(__file__).parents[2]), 
+                 dst=str(Path(__file__).parents[0]))
             self.conan_data = yaml.safe_load(Path("conandata.yml").read_text())
 
     def source(self):
