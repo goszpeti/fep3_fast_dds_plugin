@@ -27,8 +27,8 @@ elseif ( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../conanbuildinfo_multi.cmake)
 else()
     message(FATAL_ERROR "Conan build info can't be found.")
 endif()
-set(gtest_search_mode CONFIG)
 conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+set(gtest_search_mode CONFIG)
 
 add_compile_definitions(DEV_ESSENTIAL_DISABLE_MAKE_RESULT_CHECK_RESERVED_ZERO)
 

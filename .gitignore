@@ -1,2 +1,4 @@
 .vscode
 **/build/*
+# only exlcude from subfolder
+thirdparty/**/conandata.yml

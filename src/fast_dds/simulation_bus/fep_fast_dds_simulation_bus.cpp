@@ -101,7 +101,7 @@ public:
     std::unique_ptr<ISimulationBus::IDataReader> getReader(const std::string& name,
                                                            size_t queue_capacity = 0)
     {
-        auto topic = getOrCreateTopic(name, fep3::base::arya::StreamTypeRaw());
+        auto topic = getOrCreateTopic(name, fep3::base::StreamTypeRaw());
         return topic->createDataReader(queue_capacity, _data_access_collection);
     }
 
@@ -115,7 +115,7 @@ public:
     std::unique_ptr<ISimulationBus::IDataWriter> getWriter(const std::string& name,
                                                            size_t queue_capacity = 0)
     {
-        auto topic = getOrCreateTopic(name, fep3::base::arya::StreamTypeRaw());
+        auto topic = getOrCreateTopic(name, fep3::base::StreamTypeRaw());
         return topic->createDataWriter(queue_capacity);
     }
 
@@ -421,7 +421,6 @@ fep3::Result FastDDSSimulationBus::initialize()
                 "https:// github.com/eProsima/Fast-DDS/blob/master/resources/xsd/fastRTPS_profiles.xsd"
              );
     }
-    return {};
 }
 //
 fep3::Result FastDDSSimulationBus::deinitialize()

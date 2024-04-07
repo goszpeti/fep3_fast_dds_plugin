@@ -15,9 +15,9 @@ protected:
 
 public:
     virtual std::string GetTopic() = 0;
-    virtual std::unique_ptr<fep3::arya::ISimulationBus::IDataReader> createDataReader
+    virtual std::unique_ptr<fep3::ISimulationBus::IDataReader> createDataReader
         (size_t queue_capacity
         , const std::weak_ptr<fep3::base::SimulationDataAccessCollection<ReaderItemQueue>>& data_access_collection
         ) = 0;
-    virtual std::unique_ptr<fep3::arya::ISimulationBus::IDataWriter> createDataWriter(size_t queue_capacity) = 0;
+    virtual std::unique_ptr<fep3::ISimulationBus::IDataWriter> createDataWriter(size_t queue_capacity) = 0;
 };

@@ -43,14 +43,14 @@ a modified fep_components file.
 The project is set up with Conan using the available public packages and building the missing ones with custom conan files in the thirdparty directory.
 For linux please use an appropriate profile, like the supplied linux_gcc_9
 
-    conan create thirdparty/fast-dds/conanfile.py /_@_ -pr build_profiles/win_142
-    conan create thirdparty/dev_essential/conanfile.py /_@_ -pr build_profiles/win_142
-    conan create thirdparty/fep3_participant/conanfile.py /_@_ -pr build_profiles/win_142
-    conan create thirdparty/fep3_system/conanfile.py /_@_ -pr build_profiles/win_142
-    conan create thirdparty/fep3_base_utilities/conanfile.py /_@_ -pr build_profiles/win_142
-    conan create thirdparty/fep3_sdk/conanfile.py /_@_ -pr build_profiles/win_142
+    conan create thirdparty/fast_dds/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
+    conan create thirdparty/dev_essential/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
+    conan create thirdparty/fep3_participant/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
+    conan create thirdparty/fep3_system/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
+    conan create thirdparty/fep3_base_utilities/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
+    conan create thirdparty/fep3_sdk/conanfile.py /_@_ -pr build_profiles/win_142_relwithdebinfo
 
-    conan create . -pr build_profiles/win_142
+    conan create . -pr build_profiles/win_142_relwithdebinfo
 
 ## Used products and sources
 

@@ -8,7 +8,7 @@
 #include "../reader_item_queue.h"
 
 class StreamItemDataReader
-    : public fep3::arya::ISimulationBus::IDataReader
+    : public fep3::ISimulationBus::IDataReader
 {
 public:
     StreamItemDataReader(const std::shared_ptr<StreamItemTopic> & topic

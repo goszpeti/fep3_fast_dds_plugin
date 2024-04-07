@@ -7,8 +7,8 @@
 
 #include "fast_dds_include.h"
 
-std::shared_ptr<fep3::arya::IStreamType> createStreamType(const fep3::ddstypes::StreamType& dds_streamtype, const SampleInfo& sample_info);
-std::shared_ptr<fep3::arya::IDataSample> createSample(const fep3::ddstypes::BusData& dds_sample, const SampleInfo& sample_info);
+std::shared_ptr<fep3::IStreamType> createStreamType(const fep3::ddstypes::StreamType& dds_streamtype, const SampleInfo& sample_info);
+std::shared_ptr<fep3::IDataSample> createSample(const fep3::ddstypes::BusData& dds_sample, const SampleInfo& sample_info);
 
 class StreamItemTopic;
 

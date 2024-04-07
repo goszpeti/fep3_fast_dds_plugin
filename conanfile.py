@@ -31,7 +31,7 @@ class ConanProduct(ConanFile):
         self.tool_requires("cmake/3.25.0")
 
     def requirements(self):
-        self.requires("fep_sdk_participant/3.1.0@fep_oss/testing", private=True)
+        self.requires("fep_sdk_participant/3.2.0@fep_oss/testing", private=True)
         self.requires("fast-dds/2.10.1@fep_oss/testing", private=True)
         if self.enable_testing:
             self.requires("gtest/1.10.0", private=True)

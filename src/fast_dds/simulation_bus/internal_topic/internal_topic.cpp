@@ -78,7 +78,7 @@ bool InternalTopic::InternalReader::pop(fep3::ISimulationBus::IDataReceiver& rec
 }
 
 void InternalTopic::InternalReader::reset(
-    const std::shared_ptr<fep3::arya::ISimulationBus::IDataReceiver>& /*receiver*/)
+    const std::shared_ptr<fep3::ISimulationBus::IDataReceiver>& /*receiver*/)
 {
 }
 

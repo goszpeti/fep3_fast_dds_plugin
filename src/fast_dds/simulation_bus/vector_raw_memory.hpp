@@ -7,7 +7,7 @@
 /**
  * Converts a std::vector<uint8_t> into a IRawMemory interface
  */
-struct VectorRawMemory: public fep3::arya::IRawMemory
+struct VectorRawMemory: public fep3::IRawMemory
 {
 
 public:

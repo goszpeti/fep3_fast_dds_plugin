@@ -7,7 +7,7 @@
 #include <fep3/components/logging/logging_service_intf.h>
 #include <fep3/components/simulation_bus/simulation_bus_intf.h>
 
-using namespace fep3::arya;
+using namespace fep3;
 
 #if defined _WIN32
 #ifdef BUILD_SIMBUS
@@ -19,7 +19,7 @@ using namespace fep3::arya;
 #define EXPORTED
 #endif
 
-class EXPORTED FastDDSSimulationBus : public fep3::base::Component<fep3::arya::ISimulationBus> {
+class EXPORTED FastDDSSimulationBus : public fep3::base::Component<fep3::ISimulationBus> {
 public:
     FastDDSSimulationBus();
     ~FastDDSSimulationBus();

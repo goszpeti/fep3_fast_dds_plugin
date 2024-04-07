@@ -13,7 +13,7 @@
  */
 class InternalTopic : public std::enable_shared_from_this<InternalTopic>, public ITopic {
 private:
-    class InternalReader : public fep3::arya::ISimulationBus::IDataReader {
+    class InternalReader : public fep3::ISimulationBus::IDataReader {
     public:
         InternalReader(const std::shared_ptr<InternalTopic>& internal_topic);
         ~InternalReader() = default;
@@ -23,7 +23,7 @@ private:
         bool pop(fep3::ISimulationBus::IDataReceiver& receiver) override;
 
         void reset(
-            const std::shared_ptr<fep3::arya::ISimulationBus::IDataReceiver>& receiver) override;
+            const std::shared_ptr<fep3::ISimulationBus::IDataReceiver>& receiver) override;
 
         fep3::Optional<fep3::Timestamp> getFrontTime() const override;
 

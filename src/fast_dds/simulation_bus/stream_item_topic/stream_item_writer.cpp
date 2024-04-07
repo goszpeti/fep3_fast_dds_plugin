@@ -35,7 +35,7 @@ StreamItemDataWriter::~StreamItemDataWriter()
     _publisher->delete_contained_entities();
 }
 
-struct BytesTopicTypeRawMemory : public fep3::arya::IRawMemory
+struct BytesTopicTypeRawMemory : public fep3::IRawMemory
 {
 
 public:
