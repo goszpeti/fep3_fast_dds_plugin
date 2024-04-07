@@ -1,0 +1,195 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 72dd8a9..f60bcd4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -31,6 +31,21 @@ file(STRINGS version
+ project(fep3-system-library VERSION ${VERSION})
+ set(FEP3_SYSTEM_LIBRARY fep3_system)
+ 
++# check for conan
++message(STATUS "Including Conan build info")
++if ( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
++    include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
++elseif ( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../conanbuildinfo.cmake)
++    include(${CMAKE_CURRENT_BINARY_DIR}/../conanbuildinfo.cmake)
++elseif ( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo_multi.cmake)
++    include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo_multi.cmake)
++elseif ( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../conanbuildinfo_multi.cmake)
++    include(${CMAKE_CURRENT_BINARY_DIR}/../conanbuildinfo_multi.cmake)
++else()
++    message(FATAL_ERROR "Conan build info can't be found.")
++endif()
++conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
++
+ set(FEP3_SYSTEM_LIB_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+ set(FEP3_SYSTEM_LIB_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+ set(FEP3_SYSTEM_LIB_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+diff --git a/src/fep_system/CMakeLists.txt b/src/fep_system/CMakeLists.txt
+index 32a47ff..c260268 100644
+--- a/src/fep_system/CMakeLists.txt
++++ b/src/fep_system/CMakeLists.txt
+@@ -412,11 +412,10 @@ set(fep3_system_use_rtidds ${FEP3_USE_RTIDDS})
+ configure_file(fep3_system-config.cmake.in ${CMAKE_BINARY_DIR}/fep3_system-config.cmake @ONLY)
+ install(FILES ${CMAKE_BINARY_DIR}/fep3_system-config.cmake DESTINATION .)
+ 
+-
+ if(WIN32)
+-    set(TARGET_SERVICE_BUS ./rti/fep3_dds_service_bus_plugin.dll)
++    set(TARGET_SERVICE_BUS ./fep_components_plugin.dll)
+ else()
+-    set(TARGET_SERVICE_BUS ./rti/libfep3_dds_service_bus_plugin.so)
++    set(TARGET_SERVICE_BUS ./libfep_components_plugin.so)
+ endif()
+ 
+ configure_file(fep3_system.fep_components.in ${CMAKE_BINARY_DIR}/fep3_system.fep_components @ONLY)
+diff --git a/src/fep_system/fep3_system-macros.cmake b/src/fep_system/fep3_system-macros.cmake
+index 2d0a9c7..74febca 100644
+--- a/src/fep_system/fep3_system-macros.cmake
++++ b/src/fep_system/fep3_system-macros.cmake
+@@ -43,11 +43,14 @@ macro(fep3_system_install NAME DESTINATION)
+ 
+     if("${CMAKE_PROJECT_NAME}" STREQUAL "fep3-system-library")
+         # if this is called from fep system directly it can call the participant macro.
+-        internal_fep3_dds_install(${DESTINATION})
+-        install(FILES $<TARGET_FILE:fep3_dds_service_bus_plugin> DESTINATION ${DESTINATION}/rti)
+-        if(MSVC)
+-            install(FILES $<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.pdb DESTINATION ${DESTINATION}/rti CONFIGURATIONS Debug RelWithDebInfo)
+-        endif(MSVC)
++        if (fep3_participant_use_rtidds)
++            internal_fep3_dds_install(${DESTINATION})
++            install(FILES $<TARGET_FILE:fep3_dds_service_bus_plugin> DESTINATION ${DESTINATION}/rti)
++            if(MSVC)
++                install(FILES $<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.pdb DESTINATION ${DESTINATION}/rti CONFIGURATIONS Debug RelWithDebInfo)
++            endif(MSVC)
++        endif()
++
+     else()
+         install(DIRECTORY $<TARGET_FILE_DIR:fep3_system>/rti/ DESTINATION ${DESTINATION}/rti)
+     endif()
+@@ -91,32 +94,33 @@ macro(fep3_system_deploy_helper NAME TARGET_FOLDER)
+ endmacro(fep3_system_deploy_helper NAME)
+ 
+ macro(fep3_system_plugins_deploy_helper NAME TARGET_FOLDER)
+-
++    # TODO would need fep3_participant_use_rtidds check
+     add_custom_command(TARGET ${NAME} POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E make_directory "${TARGET_FOLDER}/http"
+-        COMMAND ${CMAKE_COMMAND} -E make_directory "${TARGET_FOLDER}/rti"
+-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fep3_http_service_bus>" "${TARGET_FOLDER}/http"
+-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fep3_dds_service_bus_plugin>" "${TARGET_FOLDER}/rti"
++        # COMMAND ${CMAKE_COMMAND} -E make_directory "${TARGET_FOLDER}/rti"
++        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fep3_http_service_bus>" "${TARGET_FOLDER}/http"
++        # COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fep3_dds_service_bus_plugin>" "${TARGET_FOLDER}/rti"
+         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE_DIR:fep3_system>/fep3_system.fep_components" "${TARGET_FOLDER}"
+     )
+     if(MSVC)
+         add_custom_command(TARGET ${NAME} POST_BUILD
+             COMMAND ${CMAKE_COMMAND} -E $<IF:$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>,copy_if_different,true>  "$<TARGET_FILE_DIR:fep3_http_service_bus>/fep3_http_service_bus.$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:pdb>" "${TARGET_FOLDER}/http"
+-            COMMAND ${CMAKE_COMMAND} -E $<IF:$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>,copy_if_different,true>  "$<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:pdb>" "${TARGET_FOLDER}/rti"
++            # COMMAND ${CMAKE_COMMAND} -E $<IF:$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>,copy_if_different,true>  "$<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:pdb>" "${TARGET_FOLDER}/rti"
+         )
+     endif()
+ 
+-    if("${PROJECT_NAME}" STREQUAL "fep3-system-library")
+-
+-        # if this is called from fep system directly it can call the participant macro.
+-        internal_fep3_participant_deploy_dds(${NAME} ${TARGET_FOLDER})
+-    else()
+-
+-        if(MSVC)
+-        # if this is called from another project, we have can copy the whole rti folder
+-            add_custom_command(TARGET ${NAME} POST_BUILD
+-            COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:fep3_system>/rti" "${TARGET_FOLDER}/rti"
+-            )
++    if (fep3_participant_use_rtidds)
++        if("${PROJECT_NAME}" STREQUAL "fep3-system-library")
++            # if this is called from fep system directly it can call the participant macro.
++            internal_fep3_participant_deploy_dds(${NAME} ${TARGET_FOLDER})
++        else()
++
++            if(MSVC)
++            # if this is called from another project, we have can copy the whole rti folder
++                add_custom_command(TARGET ${NAME} POST_BUILD
++                COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:fep3_system>/rti" "${TARGET_FOLDER}/rti"
++                )
++            endif()
+         endif()
+     endif()
+ endmacro(fep3_system_plugins_deploy_helper)
+diff --git a/src/fep_system/rpc_services/participant_statemachine_proxy.hpp b/src/fep_system/rpc_services/participant_statemachine_proxy.hpp
+index 9338a42..c906941 100644
+--- a/src/fep_system/rpc_services/participant_statemachine_proxy.hpp
++++ b/src/fep_system/rpc_services/participant_statemachine_proxy.hpp
+@@ -104,7 +104,7 @@ public:
+     void load() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().load(); }, "loading");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().load().asBool(); }, "loading");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine load denied");
+@@ -113,7 +113,7 @@ public:
+     void unload() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().unload(); }, "unloading");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().unload().asBool(); }, "unloading");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine load denied");
+@@ -123,7 +123,7 @@ public:
+     void initialize() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().initialize(); }, "initializing");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().initialize().asBool(); }, "initializing");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine initialize denied");
+@@ -132,7 +132,8 @@ public:
+     void deinitialize() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().deinitialize(); }, "deinitializing");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().deinitialize().asBool(); },
++                          "deinitializing");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine deinitialize denied");
+@@ -141,7 +142,7 @@ public:
+     void start() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().start(); }, "starting");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().start().asBool(); }, "starting");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine start denied");
+@@ -150,7 +151,7 @@ public:
+     void stop() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().stop(); }, "stopping");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().stop().asBool(); }, "stopping");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine stop denied");
+@@ -159,7 +160,7 @@ public:
+     void pause() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().pause(); }, "pausing");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().pause().asBool(); }, "pausing");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine pause denied");
+@@ -169,7 +170,7 @@ public:
+     void shutdown() override
+     {
+         auto change_succeeded = false;
+-        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().exit(); }, "shutdowning");
++        CALL_WITH_TIMEOUT({ change_succeeded = GetStub().exit().asBool(); }, "shutdowning");
+         if (!change_succeeded)
+         {
+             throw std::logic_error("state machine shutdown denied");
