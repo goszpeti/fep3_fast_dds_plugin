@@ -3,7 +3,7 @@ from conans import ConanFile, CMake
 
 class ConanProduct(ConanFile):
     name = "fep3_fast_dds_plugin"
-    version = "0.1.0"
+    version = "3.2.0"
     description = "FEP3 eProsima Fast DDS Simulation Bus Plugin"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "txt", "CMakeDeps"

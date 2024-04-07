@@ -57,6 +57,7 @@ jobs:
           conan upload "dev*" -r=fep3_oss --all --confirm --force
           conan upload "fast*" -r=fep3_oss --all --confirm --force
           conan upload "fep*" -r=fep3_oss --all --confirm --force
+          conan remove "*" -r=fep3_oss --force --outdated 
   build_armv8_deps_docker:
     runs-on: ubuntu-latest
     env:
