@@ -75,12 +75,14 @@ jobs:
           githubToken: ${{ github.token }}
           install: | 
             apt-get update -q -y
-            apt-get install git wget g++-9 gcc-9 python3 python3-pip -y
+            apt-get install git g++-9 gcc-9 python3 python3-pip -y
             pip install "conan==1.59.0" --use-pep517
           # for some reason cmake install makes the container unusable afterwards?!, so install it at runtime...
           run: |
+            conan remote clean
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
+            conan remote add conancenter https://center.conan.io false
             export PATH=$PATH:$PWD/bin && conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}

@@ -12,11 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update --allow-releaseinfo-change
 RUN apt install git g++-9 python3 python3-pip -y
 RUN pip3 install "conan==1.59.0" --use-pep517
-RUN apt install wget -y
 WORKDIR /root
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3-linux-aarch64.sh
-RUN chmod +x ./cmake-3.26.3-linux-aarch64.sh
-RUN ./cmake-3.26.3-linux-aarch64.sh  --skip-license 
 ENV PATH "$PATH:/root/bin"
 
 RUN conan config set general.revisions_enabled=True
@@ -37,8 +33,6 @@ WORKDIR /root/fep3_fast_dds_plugin
 # RUN conan create . -pr build_profiles/linux_armv8_gcc9 --ignore-dirty
 # RUN conan upload fep3_fast_dds_plugin* -r=local --all -c --no-overwrite
 #  --force
-
-
 
 # To export with conan - run a local server and use:
 # "url": "http://host.docker.internal:9300" for the host conan server as url config

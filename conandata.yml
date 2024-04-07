@@ -18,8 +18,8 @@ tool_reqs:
   pybind11: pybind11/2.12.0
 
 reqs:
-  dev_essential: dev_essential/1.3.1@fep_oss/testing # stable
-  fep_sdk_participant: fep_sdk_participant/3.2.0@fep_oss/testing
+  dev_essential: dev_essential/1.3.1@fep_oss/stable
+  fep_sdk_participant: fep_sdk_participant/3.2.0@fep_oss/stable
   fast-dds: fast-dds/2.10.1@fep_oss/testing
   boost: boost/1.75.0
   clipp: clipp/1.2.3
