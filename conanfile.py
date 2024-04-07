@@ -21,6 +21,8 @@ class ConanProduct(ConanFile):
         "revision": "auto"
     }
 
+    no_copy_source = True
+
     def configure(self):
         import json
         testing_internal = json.loads(self.env.get("enable_testing", "false"))
@@ -28,13 +30,13 @@ class ConanProduct(ConanFile):
         return super().configure()
 
     def build_requirements(self):
-        self.tool_requires("cmake/3.25.0")
+        self.tool_requires(self.conan_data["tool_reqs"]["cmake"])
 
     def requirements(self):
-        self.requires("fep_sdk_participant/3.2.0@fep_oss/testing", private=True)
-        self.requires("fast-dds/2.10.1@fep_oss/testing", private=True)
+        self.requires(self.conan_data["reqs"]["fep_sdk_participant"], private=True)
+        self.requires(self.conan_data["reqs"]["fast-dds"], private=True)
         if self.enable_testing:
-            self.requires("gtest/1.10.0", private=True)
+            self.requires(self.conan_data["test_reqs"]["gtest-dds"], private=True)
 
     def build(self):
         cmake = CMake(self)
