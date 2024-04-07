@@ -37,7 +37,7 @@ jobs:
           # cache: 'pip' # caching pip dependencies only works with requirements.txt or similar
       - name: Install specific Conan version
         run: | # markupsafe is a workaround fix for broken conan dependencies
-          pip install "conan==1.59.0" --use-pep517
+          pip install "conan==1.60.2" --use-pep517
       - name: Add remote
         run: |
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
@@ -77,7 +77,7 @@ jobs:
           install: | 
             apt-get update -q -y
             apt-get install git g++-9 gcc-9 python3 python3-pip -y
-            pip install "conan==1.59.0" --use-pep517
+            pip install "conan==1.60.2" --use-pep517
           # for some reason cmake install makes the container unusable afterwards?!, so install it at runtime...
           run: |
             conan remote clean

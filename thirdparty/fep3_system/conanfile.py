@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import yaml
@@ -14,7 +13,7 @@ class ConanProduct(ConanFile):
     generators = "cmake", "txt", "CMakeDeps"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True, 
-                       "ccpython:shared": True,
+                       "cpython:shared": False,
                        "boost:without_date_time": False,
                        "boost:without_filesystem": False,
                         "cpython:with_bz2": False,
