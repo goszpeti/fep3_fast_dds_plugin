@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 72dd8a9..f60bcd4 100644
+index 72dd8a9..8ef32aa 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -31,6 +31,21 @@ file(STRINGS version
@@ -24,6 +24,15 @@ index 72dd8a9..f60bcd4 100644
  set(FEP3_SYSTEM_LIB_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
  set(FEP3_SYSTEM_LIB_VERSION_MINOR ${PROJECT_VERSION_MINOR})
  set(FEP3_SYSTEM_LIB_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+@@ -44,7 +59,7 @@ if(MSVC)
+     add_compile_options(/W4 /WX /wd4251 /wd4100)
+ else()
+     # TODO -Wno-comment should be removed when ODAUTIL-169 is fixed
+-    add_compile_options(-Wall -Wno-unknown-pragmas -Wno-reorder -Werror -Wextra -pedantic -Wno-comment)
++    add_compile_options(-Wall -Wno-unknown-pragmas -Wno-reorder -Werror -Wextra -pedantic -Wno-comment -Wno-pessimizing-move)
+ endif()
+ 
+ option(fep3_system_cmake_enable_documentation
 diff --git a/src/fep_system/CMakeLists.txt b/src/fep_system/CMakeLists.txt
 index 32a47ff..64e479c 100644
 --- a/src/fep_system/CMakeLists.txt

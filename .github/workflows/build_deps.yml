@@ -48,7 +48,7 @@ jobs:
         run: |
           conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
           conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
-          conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+          conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
           conan create thirdparty/fep3_base_utilities/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
           conan create thirdparty/fast_dds/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
 #          # conan create thirdparty/fep3_sdk/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
@@ -85,8 +85,9 @@ jobs:
             conan remote add conancenter https://center.conan.io false
             export PATH=$PATH:$PWD/bin && conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
-            export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+            export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_base_utilities/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_sdk/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fast_dds/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             conan upload "*" -r=fep3_oss --all --confirm --force
+            conan remove "*" -r=fep3_oss --force --outdated 

@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5077b0f..2eaf3a5 100644
+index 5077b0f..342729f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -35,6 +35,21 @@ set(DOXYGEN_WARN_IF_UNDOCUMENTED "No")
@@ -24,6 +24,15 @@ index 5077b0f..2eaf3a5 100644
  # Enable strict compiler warnings
  if(MSVC)
      # TODO /WD4100 should be removed when ODAUTIL-167 is fixed
+@@ -42,7 +57,7 @@ if(MSVC)
+     add_compile_options(/W4 /WX /wd4251 /wd4100)
+ else()
+     # TODO -Wno-comment should be removed when ODAUTIL-169 is fixed
+-    add_compile_options(-Wall -Wno-unknown-pragmas -Wno-reorder -Werror -Wextra -pedantic -Wno-comment)
++    add_compile_options(-Wall -Wno-unknown-pragmas -Wno-reorder -Werror -Wextra -pedantic -Wno-comment -Wno-pessimizing-move)
+ endif()
+ 
+ include(scripts/cmake/enable_multicore_compilation.cmake)
 diff --git a/src/fep3/CMakeLists.txt b/src/fep3/CMakeLists.txt
 index 56afec7..7d9692b 100644
 --- a/src/fep3/CMakeLists.txt

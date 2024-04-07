@@ -14,9 +14,17 @@ class ConanProduct(ConanFile):
     generators = "cmake", "txt", "CMakeDeps"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True, 
-                       "cpython:shared": True,
+                       "ccpython:shared": True,
                        "boost:without_date_time": False,
-                       "boost:without_filesystem": False}
+                       "boost:without_filesystem": False,
+                        "cpython:with_bz2": False,
+                        "cpython:with_curses": False,
+                        "cpython:with_gdbm": False,
+                        "cpython:with_lzma": False,
+                        "cpython:with_nis": False,
+                        "cpython:with_sqlite3": False,
+                        "cpython:with_tkinter": False,
+                       }
     no_copy_source = True
     short_paths = True
     exports_sources = "patch.diff"
