@@ -43,7 +43,7 @@ class ConanProduct(ConanFile):
         self.requires(self.conan_data["reqs"]["clipp"])
 
     def build(self):
-        patch_str = (Path(self.source_folder) / "../patch.diff").read_text()
+        patch_str = (Path(self.source_folder) / "patch.diff").read_text()
         patch(self, patch_string=patch_str)
 
         cmake = CMake(self)

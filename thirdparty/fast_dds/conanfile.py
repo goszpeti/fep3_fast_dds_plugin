@@ -43,6 +43,7 @@ class FastDDSConan(ConanFile):
         "with_ssl": False,
         "with_statistics": False
     }
+    no_copy_source = True
 
     @property
     def _min_cppstd(self):

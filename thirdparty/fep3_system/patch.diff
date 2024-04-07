@@ -25,7 +25,7 @@ index 72dd8a9..f60bcd4 100644
  set(FEP3_SYSTEM_LIB_VERSION_MINOR ${PROJECT_VERSION_MINOR})
  set(FEP3_SYSTEM_LIB_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 diff --git a/src/fep_system/CMakeLists.txt b/src/fep_system/CMakeLists.txt
-index 32a47ff..c260268 100644
+index 32a47ff..64e479c 100644
 --- a/src/fep_system/CMakeLists.txt
 +++ b/src/fep_system/CMakeLists.txt
 @@ -412,11 +412,10 @@ set(fep3_system_use_rtidds ${FEP3_USE_RTIDDS})
@@ -35,38 +35,60 @@ index 32a47ff..c260268 100644
 -
  if(WIN32)
 -    set(TARGET_SERVICE_BUS ./rti/fep3_dds_service_bus_plugin.dll)
-+    set(TARGET_SERVICE_BUS ./fep_components_plugin.dll)
++    set(TARGET_SERVICE_BUS ./http/fep3_http_service_bus)
  else()
 -    set(TARGET_SERVICE_BUS ./rti/libfep3_dds_service_bus_plugin.so)
-+    set(TARGET_SERVICE_BUS ./libfep_components_plugin.so)
++    set(TARGET_SERVICE_BUS ./http/libfep3_http_service_bus)
  endif()
  
  configure_file(fep3_system.fep_components.in ${CMAKE_BINARY_DIR}/fep3_system.fep_components @ONLY)
+diff --git a/src/fep_system/fep3_system-config.cmake.in b/src/fep_system/fep3_system-config.cmake.in
+index d1512c0..34adbc3 100644
+--- a/src/fep_system/fep3_system-config.cmake.in
++++ b/src/fep_system/fep3_system-config.cmake.in
+@@ -29,7 +29,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/lib/cmake/fep3_system_targets.cmake)
+ if(NOT fep3_particpant_FOUND)
+     # include the target for http to install it on client side
+     include(${CMAKE_CURRENT_LIST_DIR}/lib/cmake/fep3_http_service_bus_targets.cmake)
+-    include(${CMAKE_CURRENT_LIST_DIR}/lib/cmake/fep3_dds_service_bus_plugin_targets.cmake)
++    if(fep3_system_use_rtidds)
++        include(${CMAKE_CURRENT_LIST_DIR}/lib/cmake/fep3_dds_service_bus_plugin_targets.cmake)
++    endif()
+ endif()
+ 
+ set(fep3_system_library_FOUND true)
 diff --git a/src/fep_system/fep3_system-macros.cmake b/src/fep_system/fep3_system-macros.cmake
-index 2d0a9c7..74febca 100644
+index 2d0a9c7..dce444e 100644
 --- a/src/fep_system/fep3_system-macros.cmake
 +++ b/src/fep_system/fep3_system-macros.cmake
-@@ -43,11 +43,14 @@ macro(fep3_system_install NAME DESTINATION)
+@@ -41,15 +41,17 @@ macro(fep3_system_install NAME DESTINATION)
+         install(FILES $<TARGET_FILE_DIR:fep3_http_service_bus>/fep3_http_service_bus.pdb DESTINATION ${DESTINATION}/http CONFIGURATIONS Debug RelWithDebInfo)
+     endif()
  
-     if("${CMAKE_PROJECT_NAME}" STREQUAL "fep3-system-library")
-         # if this is called from fep system directly it can call the participant macro.
+-    if("${CMAKE_PROJECT_NAME}" STREQUAL "fep3-system-library")
+-        # if this is called from fep system directly it can call the participant macro.
 -        internal_fep3_dds_install(${DESTINATION})
 -        install(FILES $<TARGET_FILE:fep3_dds_service_bus_plugin> DESTINATION ${DESTINATION}/rti)
 -        if(MSVC)
 -            install(FILES $<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.pdb DESTINATION ${DESTINATION}/rti CONFIGURATIONS Debug RelWithDebInfo)
 -        endif(MSVC)
-+        if (fep3_participant_use_rtidds)
-+            internal_fep3_dds_install(${DESTINATION})
-+            install(FILES $<TARGET_FILE:fep3_dds_service_bus_plugin> DESTINATION ${DESTINATION}/rti)
-+            if(MSVC)
-+                install(FILES $<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.pdb DESTINATION ${DESTINATION}/rti CONFIGURATIONS Debug RelWithDebInfo)
-+            endif(MSVC)
+-    else()
+-        install(DIRECTORY $<TARGET_FILE_DIR:fep3_system>/rti/ DESTINATION ${DESTINATION}/rti)
++    if (fep3_participant_use_rtidds)
++        if("${CMAKE_PROJECT_NAME}" STREQUAL "fep3-system-library")
++            # if this is called from fep system directly it can call the participant macro.
++                internal_fep3_dds_install(${DESTINATION})
++                install(FILES $<TARGET_FILE:fep3_dds_service_bus_plugin> DESTINATION ${DESTINATION}/rti)
++                if(MSVC)
++                    install(FILES $<TARGET_FILE_DIR:fep3_dds_service_bus_plugin>/fep3_dds_service_bus_plugin.pdb DESTINATION ${DESTINATION}/rti CONFIGURATIONS Debug RelWithDebInfo)
++                endif(MSVC)
++        else()
++            install(DIRECTORY $<TARGET_FILE_DIR:fep3_system>/rti/ DESTINATION ${DESTINATION}/rti)
 +        endif()
-+
-     else()
-         install(DIRECTORY $<TARGET_FILE_DIR:fep3_system>/rti/ DESTINATION ${DESTINATION}/rti)
      endif()
-@@ -91,32 +94,33 @@ macro(fep3_system_deploy_helper NAME TARGET_FOLDER)
+ endmacro(fep3_system_install NAME DESTINATION)
+ 
+@@ -91,32 +93,33 @@ macro(fep3_system_deploy_helper NAME TARGET_FOLDER)
  endmacro(fep3_system_deploy_helper NAME)
  
  macro(fep3_system_plugins_deploy_helper NAME TARGET_FOLDER)

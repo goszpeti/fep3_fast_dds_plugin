@@ -3,6 +3,7 @@
 # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
 # sudo docker run  -i --platform linux/arm64  --rm -t fep3fastddsplugin:latest /bin/bash
 
+# brings glibc 2.31
 FROM --platform=linux/arm64 arm64v8/ubuntu:20.04 AS base
 
 ENV DISPLAY=:99.0
@@ -18,9 +19,6 @@ RUN chmod +x ./cmake-3.26.3-linux-aarch64.sh
 RUN ./cmake-3.26.3-linux-aarch64.sh  --skip-license 
 ENV PATH "$PATH:/root/bin"
 
-RUN conan remote clean
-RUN conan remote add local http://host.docker.internal:9300 false
-RUN conan user demo -r local -p demo
 RUN conan config set general.revisions_enabled=True
 
 COPY ./ /root/fep3_fast_dds_plugin

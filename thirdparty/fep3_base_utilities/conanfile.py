@@ -1,10 +1,12 @@
 from pathlib import Path
 from conans import ConanFile, CMake
-from conan.tools.files import patch
+from conan.tools.files import copy, patch
+from conan.tools.scm import Git
+import yaml
 
 class ConanProduct(ConanFile):
     name = "fep_sdk_base_utilities"
-    version = "3.1.0"
+    version = "3.2.0"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "txt"
     options = {"fPIC": [True, False]}
@@ -13,32 +15,33 @@ class ConanProduct(ConanFile):
                        "boost:without_filesystem":False}
     no_copy_source = True
     short_paths = True
-    exports_sources = "patch1.diff"
+    exports_sources = "patch.diff"
     no_copy_export_sources = True
-    scm = {
-        "type": "git",
-        "url": "https://github.com/cariad-tech/fep3_base_utilities.git",
-        "revision": "v3.1.0"
-    }
-    
-    def configure(self):
-        return super().configure()
+    no_copy_source = True
 
-    def build_requirements(self):
-        if self.settings.arch != "armv8":
-            self.tool_requires("cmake/3.25.0")
+    def init(self):
+        if not self.conan_data:
+            # copy single source of truth conan_data from repo root
+            copy(self, "conandata.yml", src=str(Path(__file__).parents[2]), dst=".")
+            self.conan_data = yaml.safe_load(Path("conandata.yml").read_text())
 
     def source(self):
-        super().source()
-        return 
+       git = Git(self)
+       sources = self.conan_data["sources"][self.name]
+       # shallow checkout
+       git.fetch_commit(url=sources["url"], commit="v3.1.0") # no newer version available
+
+    def build_requirements(self):
+        self.tool_requires(self.conan_data["tool_reqs"]["cmake"])
 
     def requirements(self):
-        self.requires(f"fep_sdk_system/3.1.0@{self.user}/{self.channel}")
-        self.requires("boost/1.75.0")
+        self.requires(f"fep_sdk_system/{self.version}@{self.user}/{self.channel}", private=True)
+        self.requires(self.conan_data["reqs"]["boost"], private=True)
+
 
     def build(self):
-        patch_str = (Path(self.source_folder) / "patch1.diff").read_text()
-        patch(self, patch_string=patch_str)
+        #patch_str = (Path(self.source_folder) / "patch.diff").read_text()
+        #patch(self, patch_string=patch_str)
 
         cmake = CMake(self)
         cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = self.options.fPIC

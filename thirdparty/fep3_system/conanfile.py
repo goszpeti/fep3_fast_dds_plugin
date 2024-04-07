@@ -40,11 +40,11 @@ class ConanProduct(ConanFile):
         self.build_requires(self.conan_data["tool_reqs"]["python3.10"])
 
     def requirements(self):
-        self.requires(f"fep_sdk_participant/3.2.0@{self.user}/{self.channel}", private=True)
+        self.requires(f"fep_sdk_participant/{self.version}@{self.user}/{self.channel}")
         self.requires(self.conan_data["tool_reqs"]["pybind11"], private=True)
 
     def build(self):
-        patch_str = (Path(self.source_folder) / "../patch.diff").read_text()
+        patch_str = (Path(self.source_folder) / "patch.diff").read_text()
         patch(self, patch_string=patch_str)
         cmake = CMake(self)
         cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = self.options.fPIC
@@ -55,7 +55,6 @@ class ConanProduct(ConanFile):
                               "Boost_USE_STATIC_LIBS": "On",
                               "fep3_participant_use_rtidds": "Off",
                               "fep3_system_cmake_python_version": "3.10",
-                            #   "pybind11_ROOT": pybind11_path
                              }
                         )
         cmake.build()

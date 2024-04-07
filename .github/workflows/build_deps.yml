@@ -6,7 +6,7 @@ env:
   LC_ALL: "en_US.UTF-8"
   CONAN_REVISIONS_ENABLED: "1"
   CONAN_NON_INTERACTIVE: "1"
-  CONAN_REF: fep_oss/testing
+  CONAN_REF: fep_oss/stable
 jobs:
   build_x64_deps:
     runs-on: ${{ matrix.os }}
@@ -19,7 +19,7 @@ jobs:
             "windows2019",
           ]
         include:
-          - name: "ubuntu20"
+          - name: "ubuntu20" # brings glibc 2.31
             os: ubuntu-20.04
             profile: linux_gcc_9_relwithdebinfo
           - name: "windows2019"
@@ -30,10 +30,6 @@ jobs:
       CONAN_PR_ARG: "-pr build_profiles/${{ matrix.profile}}"
     steps:
       - uses: actions/checkout@v3
-      # - name: Install compiler for Linux
-      #   if: matrix.os == 'ubuntu-20.04'
-      #   run: | 
-      #     sudo apt install g++-10
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -80,14 +76,9 @@ jobs:
           install: | 
             apt-get update -q -y
             apt-get install git wget g++-9 gcc-9 python3 python3-pip -y
-            wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3-linux-aarch64.sh
             pip install "conan==1.59.0" --use-pep517
           # for some reason cmake install makes the container unusable afterwards?!, so install it at runtime...
           run: |
-            uname -a
-            ls
-            chmod +x /cmake-3.26.3-linux-aarch64.sh
-            /cmake-3.26.3-linux-aarch64.sh  --skip-license
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
             export PATH=$PATH:$PWD/bin && conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
