@@ -8,56 +8,56 @@ env:
   CONAN_NON_INTERACTIVE: "1"
   CONAN_REF: fep_oss/stable
 jobs:
-  build_x64_deps:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
-    strategy:
-      matrix:
-        name:
-          [
-            "ubuntu20",
-            "windows2019",
-          ]
-        include:
-          - name: "ubuntu20" # brings glibc 2.31
-            os: ubuntu-20.04
-            profile: linux_gcc_9_relwithdebinfo
-          - name: "windows2019"
-            os: windows-2019
-            profile: win_142_relwithdebinfo
+#   build_x64_deps:
+#     runs-on: ${{ matrix.os }}
+#     timeout-minutes: 45
+#     strategy:
+#       matrix:
+#         name:
+#           [
+#             "ubuntu20",
+#             "windows2019",
+#           ]
+#         include:
+#           - name: "ubuntu20" # brings glibc 2.31
+#             os: ubuntu-20.04
+#             profile: linux_gcc_9_relwithdebinfo
+#           - name: "windows2019"
+#             os: windows-2019
+#             profile: win_142_relwithdebinfo
         
-    env:
-      CONAN_PR_ARG: "-pr build_profiles/${{ matrix.profile}}"
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-          # cache: 'pip' # caching pip dependencies only works with requirements.txt or similar
-      - name: Install specific Conan version
-        run: | # markupsafe is a workaround fix for broken conan dependencies
-          pip install "conan==1.60.2" --use-pep517
-      - name: Add remote
-        run: |
-            conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
-      - name: Log in to remote
-        run: |
-            conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
-      - name: Build dependencies
-        run: |
-          conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
-          conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
-          conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
-          conan create thirdparty/fep3_base_utilities/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
-          conan create thirdparty/fast_dds/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
-#          # conan create thirdparty/fep3_sdk/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
-      - name: Upload conan packages
-        run: |
-          conan upload "dev*" -r=fep3_oss --all --confirm --force
-          conan upload "fast*" -r=fep3_oss --all --confirm --force
-          conan upload "fep*" -r=fep3_oss --all --confirm --force
-          conan remove "*" -r=fep3_oss --force --outdated 
+#     env:
+#       CONAN_PR_ARG: "-pr build_profiles/${{ matrix.profile}}"
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: 3.11
+#           # cache: 'pip' # caching pip dependencies only works with requirements.txt or similar
+#       - name: Install specific Conan version
+#         run: | # markupsafe is a workaround fix for broken conan dependencies
+#           pip install "conan==1.60.2" --use-pep517
+#       - name: Add remote
+#         run: |
+#             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
+#       - name: Log in to remote
+#         run: |
+#             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
+#       - name: Build dependencies
+#         run: |
+#           conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+#           conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+#           conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
+#           conan create thirdparty/fep3_base_utilities/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+#           conan create thirdparty/fast_dds/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
+# #          # conan create thirdparty/fep3_sdk/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+#       - name: Upload conan packages
+#         run: |
+#           conan upload "dev*" -r=fep3_oss --all --confirm --force
+#           conan upload "fast*" -r=fep3_oss --all --confirm --force
+#           conan upload "fep*" -r=fep3_oss --all --confirm --force
+#           conan remove "*" -r=fep3_oss --force --outdated 
   build_armv8_deps_docker:
     runs-on: ubuntu-latest
     env:
@@ -76,10 +76,13 @@ jobs:
           githubToken: ${{ github.token }}
           install: | 
             apt-get update -q -y
-            apt-get install git g++-9 gcc-9 python3 python3-pip -y
+            apt-get install wget git g++-9 gcc-9 python3 python3-pip -y
+            wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3-linux-aarch64.sh
             pip install "conan==1.60.2" --use-pep517
           # for some reason cmake install makes the container unusable afterwards?!, so install it at runtime...
           run: |
+            chmod +x /cmake-3.26.3-linux-aarch64.sh
+            /cmake-3.26.3-linux-aarch64.sh  --skip-license
             conan remote clean
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
