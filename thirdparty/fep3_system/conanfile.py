@@ -4,7 +4,6 @@ import yaml
 from conan.tools.files import copy, patch
 from conan.tools.scm import Git
 from conans import CMake, ConanFile
-from conan.tools.microsoft import is_msvc
 
 class ConanProduct(ConanFile):
     name = "fep_sdk_system"
@@ -13,16 +12,9 @@ class ConanProduct(ConanFile):
     generators = "cmake", "txt", "CMakeDeps"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True, 
-                       "cpython:shared": True,
+                       "cpython:shared": True, # needed for msvc
                        "boost:without_date_time": False,
                        "boost:without_filesystem": False,
-                        "cpython:with_bz2": False,
-                        "cpython:with_curses": False,
-                        "cpython:with_gdbm": False,
-                        "cpython:with_lzma": False,
-                        "cpython:with_nis": False,
-                        "cpython:with_sqlite3": False,
-                        "cpython:with_tkinter": False,
                        }
     no_copy_source = True
     short_paths = True
@@ -38,14 +30,16 @@ class ConanProduct(ConanFile):
             self.conan_data = yaml.safe_load(Path("conandata.yml").read_text())
 
     def config_options(self):
-        if is_msvc(self):
-            self.options.deps_package_values["cpython"].with_bz2 = True
-            self.options.deps_package_values["cpython"].with_lzma = True
-            self.options.deps_package_values["cpython"].with_sqlite3 = True
-            self.options.deps_package_values["cpython"].with_tkinter = True
-            del self.options.deps_package_values["cpython"].with_curses
-            del self.options.deps_package_values["cpython"].with_gdbm
-            del self.options.deps_package_values["cpython"].with_nis
+        # we need to build python for amrv8 so disable all extra dependencies
+        if self.settings.os == "Linux":
+            self.options.deps_package_values["cpython"].with_sqlite3 = False
+            self.options.deps_package_values["cpython"].with_tkinter = False
+            self.options.deps_package_values["cpython"].with_curses = False
+        if self.settings.arch == "armv8":
+            self.options.deps_package_values["cpython"].with_bz2 = False
+            self.options.deps_package_values["cpython"].with_lzma = False
+            self.options.deps_package_values["cpython"].with_nis = False
+            self.options.deps_package_values["cpython"].with_gdbm = False
 
         return super().configure()
 
