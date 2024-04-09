@@ -32,7 +32,7 @@ public:
     void createReader();
     ReadCondition* createSampleReadCondition(const std::shared_ptr<fep3::ISimulationBus::IDataReceiver>& receiver);
     ReadCondition* createStreamTypeReadCondition(const std::shared_ptr<fep3::ISimulationBus::IDataReceiver>& receiver);
-    void ReaderItemQueue::wait_for_reader_connected(std::chrono::milliseconds timeout);
+    void wait_for_reader_connected(std::chrono::milliseconds timeout);
 
 protected:
     void on_data_available(

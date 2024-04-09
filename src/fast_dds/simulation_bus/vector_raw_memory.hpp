@@ -3,7 +3,7 @@
 #include <fep3/base/sample/raw_memory_intf.h>
 #include <vector>
 #include <cstring>
-
+#include <stdint.h>
 /**
  * Converts a std::vector<uint8_t> into a IRawMemory interface
  */
