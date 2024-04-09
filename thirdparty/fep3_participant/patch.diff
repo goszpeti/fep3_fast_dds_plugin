@@ -113,6 +113,18 @@ index e5fadbb..95c9761 100644
  
  add_library(fep3_thread_utilities STATIC
  ${CMAKE_CURRENT_SOURCE_DIR}/include/notification_waiting.h
+diff --git a/src/fep3/fep3_participant-config.cmake.in b/src/fep3/fep3_participant-config.cmake.in
+index 56e6f1b..ae1ce37 100644
+--- a/src/fep3/fep3_participant-config.cmake.in
++++ b/src/fep3/fep3_participant-config.cmake.in
+@@ -16,6 +16,7 @@ set(fep3_participant_pdb_version_str @FEP3_PARTICIPANT_LIBRARY_VERSION_MAJOR@.@F
+ include(${CMAKE_CURRENT_LIST_DIR}/fep3_participant-macros.cmake)
+ 
+ find_package(dev_essential 1.3.0 REQUIRED)
++find_package(Boost 1.73.0 REQUIRED)
+ 
+ # Add imported library target for the participant
+ include(${CMAKE_CURRENT_LIST_DIR}/lib/cmake/fep3_participant_targets.cmake)
 diff --git a/src/plugins/fep_native_components/CMakeLists.txt b/src/plugins/fep_native_components/CMakeLists.txt
 index 5805f34..3794f34 100644
 --- a/src/plugins/fep_native_components/CMakeLists.txt

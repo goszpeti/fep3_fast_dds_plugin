@@ -13,7 +13,7 @@ class ConanProduct(ConanFile):
     generators = "cmake", "txt", "CMakeDeps"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True, 
-                       "cpython:shared": False,
+                       "cpython:shared": True,
                        "boost:without_date_time": False,
                        "boost:without_filesystem": False,
                         "cpython:with_bz2": False,
@@ -39,6 +39,10 @@ class ConanProduct(ConanFile):
 
     def config_options(self):
         if is_msvc(self):
+            self.options.deps_package_values["cpython"].with_bz2 = True
+            self.options.deps_package_values["cpython"].with_lzma = True
+            self.options.deps_package_values["cpython"].with_sqlite3 = True
+            self.options.deps_package_values["cpython"].with_tkinter = True
             del self.options.deps_package_values["cpython"].with_curses
             del self.options.deps_package_values["cpython"].with_gdbm
             del self.options.deps_package_values["cpython"].with_nis

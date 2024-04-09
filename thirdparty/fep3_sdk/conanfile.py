@@ -1,21 +1,21 @@
 from pathlib import Path
 from conans import ConanFile, CMake
 from conan.tools.scm import Git
-from conan.tools.files import copy
+from conan.tools.files import copy, patch
 import yaml
 
 class ConanProduct(ConanFile):
     name = "fep_sdk"
     version = "3.2.0"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake", "txt"
+    generators = "cmake", "txt", "CMakeDeps"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True, 
                        "boost:without_date_time":False,
                        "boost:without_filesystem":False}
     no_copy_source = True
     short_paths = True
-    exports_sources = "patch1.diff"
+    exports_sources = "patch.diff"
     no_copy_export_sources = True
 
     def init(self):
@@ -49,6 +49,7 @@ class ConanProduct(ConanFile):
                               "fep3_sdk_cmake_enable_functional_tests": "OFF",
                               "fep3_sdk_cmake_enable_private_tests": "OFF",
                               "Boost_USE_STATIC_LIBS": "On",
+                              "VERSION": self.version
                              }
                         )
         cmake.build()
