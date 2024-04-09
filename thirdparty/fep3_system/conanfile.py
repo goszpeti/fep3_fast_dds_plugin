@@ -35,6 +35,7 @@ class ConanProduct(ConanFile):
             self.options.deps_package_values["cpython"].with_sqlite3 = False
             self.options.deps_package_values["cpython"].with_tkinter = False
             self.options.deps_package_values["cpython"].with_curses = False
+            self.options.deps_package_values["cpython"].shared = False
         if self.settings.arch == "armv8":
             self.options.deps_package_values["cpython"].with_bz2 = False
             self.options.deps_package_values["cpython"].with_lzma = False
