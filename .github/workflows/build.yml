@@ -85,6 +85,7 @@ jobs:
           run: |
             uname -a
             ls -a
+            git config --global --add safe.directory /home/runner/work/fep3_fast_dds_plugin/fep3_fast_dds_plugin
             git status
             conan remote clean
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
