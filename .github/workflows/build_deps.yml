@@ -54,9 +54,7 @@ jobs:
           conan create thirdparty/fep3_sdk/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
       - name: Upload conan packages
         run: |
-          conan upload "dev*" -r=fep3_oss --all --confirm --force
-          conan upload "fast*" -r=fep3_oss --all --confirm --force
-          conan upload "fep*" -r=fep3_oss --all --confirm --force
+          conan upload "*" -r=fep3_oss --all --confirm --force
           conan remove "*" -r=fep3_oss --force --outdated 
   build_armv8_deps_docker:
     runs-on: ubuntu-latest
@@ -87,7 +85,7 @@ jobs:
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
             conan remote add conancenter https://center.conan.io false
-            export PATH=$PATH:$PWD/bin && conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
+            export PATH=$PATH:$PWD/bin && conan create thirdparty/dev_essential/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_participant/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_system/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }} --build=missing
             export PATH=$PATH:$PWD/bin && conan create thirdparty/fep3_base_utilities/conanfile.py ${{ env.CONAN_REF }} ${{ env.CONAN_PR_ARG }}
