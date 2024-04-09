@@ -4,7 +4,7 @@ import yaml
 from conan.tools.files import copy, patch
 from conan.tools.scm import Git
 from conans import CMake, ConanFile
-
+from conan.tools.microsoft import is_msvc
 
 class ConanProduct(ConanFile):
     name = "fep_sdk_system"
@@ -36,6 +36,14 @@ class ConanProduct(ConanFile):
             copy(self, "conandata.yml", src=str(Path(__file__).parents[2]), 
                  dst=str(Path(__file__).parents[0]))
             self.conan_data = yaml.safe_load(Path("conandata.yml").read_text())
+
+    def config_options(self):
+        if is_msvc(self):
+            del self.options.deps_package_values["cpython"].with_curses
+            del self.options.deps_package_values["cpython"].with_gdbm
+            del self.options.deps_package_values["cpython"].with_nis
+
+        return super().configure()
 
     def source(self):
        git = Git(self)

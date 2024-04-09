@@ -9,58 +9,57 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+env:
+  LC_ALL: "en_US.UTF-8"
+  CONAN_REVISIONS_ENABLED: "1"
+  CONAN_NON_INTERACTIVE: "1"
+  CONAN_REF: fep_oss/testing
 jobs:
-  # build:
-  #   runs-on: ${{ matrix.os }}
-  #   timeout-minutes: 45
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
 
-  #   strategy:
-  #     matrix:
-  #       name:
-  #         [
-  #           "ubuntu20",
-  #           "windows2019",
-  #         ]
-  #       include:
-  #         - name: "ubuntu20"
-  #           os: ubuntu-20.04
-  #           profile: linux_gcc_9_relwithdebinfo
-  #         - name: "windows2019"
-  #           os: windows-2019
-  #           profile: win_142_relwithdebinfo
-        
-  #   env:
-  #     LC_ALL: "en_US.UTF-8"
-  #     CONAN_REVISIONS_ENABLED: "1"
-  #     CONAN_NON_INTERACTIVE: "1"
-  #     CONAN_REF: fep_oss/testing
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Install system dependencies for testing in Linux
-  #       if: matrix.os == 'ubuntu-20.04'
-  #       run: |  # terminal, file manager, xwininfo, text-editor
-  #         sudo apt install g++-10
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: 3.11
-  #         # cache: 'pip' # caching pip dependencies
-  #     - name: Install specific Conan version
-  #       run: | # markupsafe is a workaround fix for broken conan dependencies
-  #         pip install "conan==1.59.0" --use-pep517
-  #     - name: Add remote
-  #       run: |
-  #           conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
-  #     - name: Log in to remote
-  #       run: |
-  #           conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}W
-  #     - name: Build own package
-  #       run: |
-  #           conan create . ${{ env.CONAN_REF }} -pr build_profiles/${{ matrix.profile}}
-  #     - name: Upload conan package
-  #       run: |
-  #           conan upload fep3_fast_dds_plugin* -r=fep3_oss --force --all -c
+    strategy:
+      matrix:
+        name:
+          [
+            "ubuntu20",
+            "windows2019",
+          ]
+        include:
+          - name: "ubuntu20"
+            os: ubuntu-20.04
+            profile: linux_gcc_9_relwithdebinfo
+          - name: "windows2019"
+            os: windows-2019
+            profile: win_142_relwithdebinfo
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install system dependencies for testing in Linux
+        if: matrix.os == 'ubuntu-20.04'
+        run: |  # terminal, file manager, xwininfo, text-editor
+          sudo apt install g++-10
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          # cache: 'pip' # caching pip dependencies
+      - name: Install specific Conan version
+        run: | # markupsafe is a workaround fix for broken conan dependencies
+          pip install "conan==1.59.0" --use-pep517
+      - name: Add remote
+        run: |
+            conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
+      - name: Log in to remote
+        run: |
+            conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}W
+      - name: Build own package
+        run: |
+            conan create . ${{ env.CONAN_REF }} -pr build_profiles/${{ matrix.profile}}
+      - name: Upload conan package
+        run: |
+            conan upload fep3_fast_dds_plugin* -r=fep3_oss --force --all -c
 
   build_armv8_docker:
     runs-on: ubuntu-latest

@@ -6,7 +6,7 @@ import yaml
 
 class ConanProduct(ConanFile):
     name = "fep_sdk"
-    version = "3.1.0"
+    version = "3.2.0"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "txt"
     options = {"fPIC": [True, False]}
