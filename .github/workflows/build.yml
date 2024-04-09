@@ -85,6 +85,7 @@ jobs:
           run: |
             uname -a
             ls -a
+            git status
             conan remote clean
             conan remote add fep3_oss ${{ vars.FEP3_GITLAB_URL }} false
             conan user -p ${{ secrets.GITLAB_FEP3_PW }} -r fep3_oss ${{ secrets.GITLAB_FEP3_USERNAME }}
