@@ -32,37 +32,32 @@ index ee46061..5d0e0f6 100644
  set(examples_integrated ON)
  add_subdirectory(examples)
 diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
-index 37f5893..2e52a6e 100644
+index 37f5893..49a4b1c 100644
 --- a/examples/CMakeLists.txt
 +++ b/examples/CMakeLists.txt
-@@ -21,14 +21,14 @@ endif()
+@@ -18,17 +18,17 @@ if (NOT examples_integrated)
+     set_property(GLOBAL PROPERTY USE_FOLDERS true)
  
+ endif()
+-
++# disable all non-gcc9 compatible examples
  add_subdirectory(src/rpc_service_bus)
- add_subdirectory(src/easy_cpp_example_datajob)
+-add_subdirectory(src/easy_cpp_example_datajob)
 -add_subdirectory(src/easy_core_example_element)
++#add_subdirectory(src/easy_cpp_example_datajob)
 +#add_subdirectory(src/easy_core_example_element)
  add_subdirectory(src/logging_example)
- add_subdirectory(src/data_triggered_simulation)
- add_subdirectory(src/dynamic_array)
+-add_subdirectory(src/data_triggered_simulation)
+-add_subdirectory(src/dynamic_array)
 -add_subdirectory(src/minimal_participant)
++#add_subdirectory(src/data_triggered_simulation)
++#add_subdirectory(src/dynamic_array)
 +#add_subdirectory(src/minimal_participant)
  add_subdirectory(src/component_plugin)
  add_subdirectory(src/async_waitset_example)
- add_subdirectory(src/multi_sender_for_one_signal_example)
+-add_subdirectory(src/multi_sender_for_one_signal_example)
++#add_subdirectory(src/multi_sender_for_one_signal_example)
  add_subdirectory(src/signal_mapping_example)
  add_subdirectory(src/fep_interface_example)
 -add_subdirectory(src/default_job_example)
 +#add_subdirectory(src/default_job_example)
-diff --git a/examples/src/easy_core_example_element/core_receiver_main.cpp b/examples/src/easy_core_example_element/core_receiver_main.cpp
-index 35c99b9..a8235a8 100644
---- a/examples/src/easy_core_example_element/core_receiver_main.cpp
-+++ b/examples/src/easy_core_example_element/core_receiver_main.cpp
-@@ -148,7 +148,7 @@ public:
-         return FEP3_PARTICIPANT_LIBRARY_VERSION_STR;
-     }
- 
--    std::tuple<fep3::Result, JobPtr, JobConfigPtr> createJob(const fep3::arya::IComponents&) override
-+    std::tuple<fep3::Result, JobPtr, JobConfigPtr> createJob(const fep3::arya::IComponents&)
-     {
-         auto config = std::make_unique<fep3::ClockTriggeredJobConfiguration>(1s);
- 
